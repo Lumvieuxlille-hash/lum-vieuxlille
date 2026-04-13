@@ -69,15 +69,16 @@
 
         .input-group { margin-bottom: 20px; position: relative; }
         label { display: block; font-weight: 600; font-size: 0.85em; margin-bottom: 8px; color: var(--accent-color); text-transform: uppercase; letter-spacing: 1px;}
-        input, select { 
+        input, select, textarea { 
             width: 100%; padding: 16px; 
             border: 2px solid #f0f0f0; border-radius: 12px; 
             background: #fff; color: var(--text-color);
             font-size: 16px; font-family: var(--font-main);
             transition: var(--transition);
         }
-        input:focus, select:focus { border-color: var(--text-color); box-shadow: 0 0 0 4px rgba(149, 72, 37, 0.1); }
-        input::placeholder { color: #ccc; }
+        textarea { resize: none; min-height: 80px; }
+        input:focus, select:focus, textarea:focus { border-color: var(--text-color); box-shadow: 0 0 0 4px rgba(149, 72, 37, 0.1); }
+        input::placeholder, textarea::placeholder { color: #ccc; }
 
         /* Choix Weekend (Brunch vs Moment) */
         .choice-group { display: flex; gap: 15px; margin-bottom: 25px; }
@@ -140,10 +141,10 @@
             <div class="step-node" data-step="3">3</div>
         </div>
 
-        <form id="reservationForm" action="https://script.google.com/macros/s/AKfycbxKZUvcl3YiDLCy0UUc6oDjwnbdS-2i3rOO5bwnxybgES8MJLVJfN6pjelAYJfT42U/exec" method="POST">
+        <form id="reservationForm" action="https://script.google.com/macros/s/AKfycbw-_s9rf2yUTIrAxiBMiSR08fhjynjDOMqUmuH-xUujnQR5nB8afKtEgIefjpTM-Ird/exec" method="POST">
             
             <div class="form-step active" id="step1">
-                <h2>Commençons par faire connaissance</h2>
+                <h2>Faisons connaissance ☺️</h2>
                 
                 <div class="input-group">
                     <label for="nom">Nom & Prénom *</label>
@@ -161,8 +162,13 @@
                 </div>
 
                 <div class="input-group">
-                    <label for="personnes">Nombre de convives *</label>
+                    <label for="personnes">Nombre de personnes *</label>
                     <input type="number" id="personnes" name="personnes" min="1" max="15" value="2" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="commentaires">Commentaires / Remarques (Optionnel)</label>
+                    <textarea id="commentaires" name="commentaires" placeholder="Une allergie ? Une poussette ? Dites-nous tout..."></textarea>
                 </div>
 
                 <div class="btn-group">
@@ -194,7 +200,7 @@
                             
                             <div class="choice-btn" id="choiceMoment" onclick="selectType('Pause gourmande au LÜM')">
                                 <strong>PAUSE GOURMANDE</strong>
-                                <span>Au LÜM (Carte classique)</span>
+                                <span>Carte classique</span>
                             </div>
                             
                         </div>
@@ -226,6 +232,7 @@
                     <p style="margin-bottom: 10px; border-top: 1px solid #e0e0e0; padding-top: 10px;">👥 <strong id="summaryPers"></strong> personnes</p>
                     <p>🗓️ le <strong id="summaryDate"></strong> à <strong id="summaryHeure"></strong></p>
                     <p id="summaryType" style="margin-top: 5px; font-style: italic; color: var(--accent-color);"></p>
+                    <p id="summaryComm" style="margin-top: 10px; font-size: 0.9em; border-top: 1px dashed #ccc; padding-top: 10px; color: #666; display: none;"></p>
                 </div>
 
                 <div class="btn-group">
@@ -257,7 +264,6 @@
             });
         }
 
-        // --- VÉRIFICATIONS STRICTES AVANT DE PASSER À L'ÉTAPE SUIVANTE ---
         function nextStep(currentStep) {
             if (currentStep === 1) {
                 const nom = document.getElementById('nom');
@@ -265,21 +271,18 @@
                 const phone = document.getElementById('phone');
                 const personnes = document.getElementById('personnes');
 
-                // Vérifie que rien n'est vide
                 if (!nom.value || !email.value || !phone.value || !personnes.value) {
                     alert("Merci de remplir tous les champs obligatoires (*).");
-                    return; // Bloque le passage à l'étape suivante
+                    return;
                 }
                 
-                // Vérifie le format de l'email
                 if(!email.checkValidity()) {
                     alert("L'adresse email n'est pas valide.");
                     return;
                 }
 
-                // Vérifie le format du téléphone
                 if(!phone.checkValidity()) {
-                    alert("Le numéro de téléphone n'est pas valide (10 chiffres requis, sans espaces).");
+                    alert("Le numéro de téléphone n'est pas valide (10 chiffres requis).");
                     return;
                 }
             }
@@ -289,13 +292,12 @@
                 const heure = document.getElementById('heure');
                 const type = document.getElementById('typeReservation');
 
-                // Vérifie que la date, l'heure ET le type d'expérience sont sélectionnés
                 if (!date.value) {
                     alert("Veuillez sélectionner une date.");
                     return;
                 }
                 if (!type.value) {
-                    alert("Veuillez choisir un type d'expérience (Brunch ou Pause gourmande).");
+                    alert("Veuillez choisir un type d'expérience.");
                     return;
                 }
                 if (!heure.value) {
@@ -303,11 +305,9 @@
                     return;
                 }
 
-                // Si tout est bon, on remplit le résumé final
                 fillSummary();
             }
 
-            // Passage à l'étape suivante si tout est validé
             document.getElementById('step' + currentStep).classList.remove('active');
             document.getElementById('step' + (currentStep + 1)).classList.add('active');
             updateProgress(currentStep + 1);
@@ -319,38 +319,35 @@
             updateProgress(currentStep - 1);
         }
 
-        // --- LOGIQUE DATE ET HEURE ---
         function handleDateChange() {
             const dateInput = document.getElementById('date').value;
             const dateTimeSection = document.getElementById('dateTimeSection');
             const tuesdayWarning = document.getElementById('tuesdayWarning');
             
-            // Reset complet lors du changement de date
             dateTimeSection.style.display = 'none';
             tuesdayWarning.style.display = 'none';
             document.getElementById('heure').value = ''; 
             document.getElementById('typeReservation').value = '';
             document.getElementById('choiceBrunch').classList.remove('selected');
             document.getElementById('choiceMoment').classList.remove('selected');
-            document.getElementById('timeGrid').innerHTML = ''; // Vide les heures
+            document.getElementById('timeGrid').innerHTML = '';
 
             if (!dateInput) return;
 
             const dateObj = new Date(dateInput);
-            const day = dateObj.getDay(); // 0=Dim, 1=Lun, 2=Mar...
+            const day = dateObj.getDay();
 
-            if (day === 2) { // Mardi (Fermé)
+            if (day === 2) { 
                 tuesdayWarning.style.display = 'block';
             } else {
                 dateTimeSection.style.display = 'block';
                 
-                if (day === 0 || day === 6) { // Samedi ou Dimanche
+                if (day === 0 || day === 6) { 
                     showWeekendOptions(true);
-                } else { // Semaine classique
+                } else { 
                     showWeekendOptions(false);
-                    // On attribue d'office le type "Pause gourmande" pour la semaine
                     document.getElementById('typeReservation').value = 'Pause gourmande au LÜM';
-                    generateStandardHours(); // Affiche toutes les heures direct
+                    generateStandardHours();
                 }
             }
         }
@@ -368,18 +365,12 @@
             }
         }
 
-        // Choix BRUNCH vs PAUSE GOURMANDE (Weekend)
         function selectType(type) {
             document.getElementById('typeReservation').value = type;
-            
-            // UI boutons : on retire la sélection des deux
             document.getElementById('choiceBrunch').classList.remove('selected');
             document.getElementById('choiceMoment').classList.remove('selected');
-            
-            // On reset l'heure si on change de type
             document.getElementById('heure').value = '';
 
-            // On ajoute la sélection visuelle au bon bouton et on génère les heures
             if (type === 'Brunch') {
                 document.getElementById('choiceBrunch').classList.add('selected');
                 generateBrunchHours();
@@ -389,7 +380,6 @@
             }
         }
 
-        // Générateurs de boutons d'heures
         function generateBrunchHours() {
             const timeGrid = document.getElementById('timeGrid');
             timeGrid.innerHTML = '';
@@ -404,8 +394,10 @@
             for (let h = OPEN_HOUR; h < CLOSE_HOUR; h++) {
                 // Heure pile
                 createTimeButton(`${h}:00`, timeGrid);
-                // Demi-heure (sauf la dernière)
-                if(h < CLOSE_HOUR - 1) createTimeButton(`${h}:30`, timeGrid);
+                // Demi-heure (autorisée jusqu'à 17h30 inclus)
+                if(h <= 17) {
+                    createTimeButton(`${h}:30`, timeGrid);
+                }
             }
         }
 
@@ -419,30 +411,35 @@
 
         function selectTime(time, btnEl) {
             document.getElementById('heure').value = time;
-            
-            // UI boutons
             const allSlots = document.querySelectorAll('.time-slot');
             allSlots.forEach(slot => slot.classList.remove('selected'));
             btnEl.classList.add('selected');
         }
 
-        // --- RÉCAPITULATIF FINAL ---
         function fillSummary() {
             document.getElementById('summaryNom').innerText = document.getElementById('nom').value;
             document.getElementById('summaryEmail').innerText = document.getElementById('email').value;
             document.getElementById('summaryPhone').innerText = document.getElementById('phone').value;
             document.getElementById('summaryPers').innerText = document.getElementById('personnes').value;
             
-            // Formatage date lisible
             const d = new Date(document.getElementById('date').value);
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('summaryDate').innerText = d.toLocaleDateString('fr-FR', options);
             
             document.getElementById('summaryHeure').innerText = document.getElementById('heure').value.replace(':','h');
             document.getElementById('summaryType').innerText = "(" + document.getElementById('typeReservation').value + ")";
+
+            // Gestion du commentaire dans le résumé
+            const commValue = document.getElementById('commentaires').value;
+            const summaryComm = document.getElementById('summaryComm');
+            if(commValue.trim() !== "") {
+                summaryComm.innerText = "Note : " + commValue;
+                summaryComm.style.display = "block";
+            } else {
+                summaryComm.style.display = "none";
+            }
         }
 
-        // Initialisation bar progression
         updateProgress(1);
     </script>
 </body>
