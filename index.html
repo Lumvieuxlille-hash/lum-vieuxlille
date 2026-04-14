@@ -53,7 +53,7 @@
             transition: var(--transition);
         }
 
-        /* --- PROGRESS BAR (MODERNE) --- */
+        /* --- PROGRESS BAR --- */
         .progress-container { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
         .progress-container::after { content:''; position: absolute; top: 15px; left: 0; width: 100%; height: 2px; background: #eee; z-index: 1; }
         .progress-bar-fill { position: absolute; top: 15px; left: 0; height: 2px; background: var(--text-color); z-index: 2; transition: var(--transition); width: 0%; }
@@ -61,7 +61,7 @@
         .step-node.active { border-color: var(--text-color); color: var(--text-color); background: var(--bg-color); }
         .step-node.done { border-color: var(--text-color); color: white; background: var(--text-color); }
 
-        /* --- FORM ELEMENTS & ANIMATIONS --- */
+        /* --- FORM ELEMENTS --- */
         .form-step { display: none; opacity: 0; transform: translateY(20px); transition: var(--transition); }
         .form-step.active { display: block; opacity: 1; transform: translateY(0); }
 
@@ -80,7 +80,7 @@
         input:focus, select:focus, textarea:focus { border-color: var(--text-color); box-shadow: 0 0 0 4px rgba(149, 72, 37, 0.1); }
         input::placeholder, textarea::placeholder { color: #ccc; }
 
-        /* Choix Weekend (Brunch vs Moment) */
+        /* Choix Weekend */
         .choice-group { display: flex; gap: 15px; margin-bottom: 25px; }
         .choice-btn { 
             flex: 1; text-align: center; padding: 20px; 
@@ -116,10 +116,8 @@
         .btn-next:hover { background-color: #7a3a1d; transform: translateY(-2px); }
         .btn-back { background-color: #f0f0f0; color: #888; }
         .btn-back:hover { background-color: #e0e0e0; color: #555;}
-        button:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none;}
 
         #tuesdayWarning { text-align: center; color: #d9534f; background: #ffefef; padding: 15px; border-radius: 10px; margin-bottom: 20px;}
-
     </style>
 </head>
 <body>
@@ -133,7 +131,6 @@
     </header>
 
     <div class="booking-card">
-        
         <div class="progress-container">
             <div class="progress-bar-fill" id="progressBar"></div>
             <div class="step-node active" data-step="1">1</div>
@@ -145,86 +142,68 @@
             
             <div class="form-step active" id="step1">
                 <h2>Faisons connaissance ☺️</h2>
-                
                 <div class="input-group">
                     <label for="nom">Nom & Prénom *</label>
                     <input type="text" id="nom" name="nom" required placeholder="Ex: Alexia Martin">
                 </div>
-
                 <div class="input-group">
                     <label for="email">Adresse Email *</label>
                     <input type="email" id="email" name="email" required placeholder="Ex: alexia@email.com">
                 </div>
-
                 <div class="input-group">
                     <label for="phone">Téléphone *</label>
                     <input type="tel" id="phone" name="phone" required placeholder="Ex: 06 12 34 56 78" pattern="[0-9]{10}">
                 </div>
-
                 <div class="input-group">
                     <label for="personnes">Nombre de personnes *</label>
                     <input type="number" id="personnes" name="personnes" min="1" max="15" value="2" required>
                 </div>
-
                 <div class="input-group">
-                    <label for="commentaires">Commentaires / Remarques (Optionnel)</label>
+                    <label for="commentaires">Commentaires (Optionnel)</label>
                     <textarea id="commentaires" name="commentaires" placeholder="Une allergie ? Une poussette ? Dites-nous tout..."></textarea>
                 </div>
-
                 <div class="btn-group">
-                    <button type="button" class="btn-next" onclick="nextStep(1)" id="btnStep1">Continuer</button>
+                    <button type="button" class="btn-next" onclick="nextStep(1)">Continuer</button>
                 </div>
             </div>
 
             <div class="form-step" id="step2">
                 <h2>Quand souhaitez-vous venir ?</h2>
-                
                 <div class="input-group">
                     <label for="date">Choisir une date *</label>
                     <input type="date" id="date" name="date" required onchange="handleDateChange()">
                 </div>
-
-                <div id="tuesdayWarning" class="hidden" style="display:none;">Oh ! Nous sommes fermés le mardi. 🤫</div>
-
+                <div id="tuesdayWarning" style="display:none;">Oh ! Nous sommes fermés le mardi. 🤫</div>
                 <div id="dateTimeSection" style="display:none;">
-                    
-                    <div id="weekendChoice" class="hidden" style="display:none;">
+                    <div id="weekendChoice" style="display:none;">
                         <label>Quel type d'expérience ? *</label>
                         <div class="choice-group">
-                            <input type="hidden" name="typeReservation" id="typeReservation" required>
-                            
+                            <input type="hidden" name="typeReservation" id="typeReservation">
                             <div class="choice-btn" id="choiceBrunch" onclick="selectType('Brunch')">
                                 <strong>BRUNCH</strong>
                                 <span>Menu dédié (Sam-Dim)</span>
                             </div>
-                            
                             <div class="choice-btn" id="choiceMoment" onclick="selectType('Pause gourmande au LÜM')">
                                 <strong>PAUSE GOURMANDE</strong>
                                 <span>Carte classique</span>
                             </div>
-                            
                         </div>
                     </div>
-
                     <div id="timeSection">
                         <label>Choisir votre horaire *</label>
                         <input type="hidden" name="heure" id="heure" required>
-                        <div class="time-grid" id="timeGrid">
-                            </div>
-                        <div class="limit-info hidden" id="brunchLimitInfo" style="display:none;">Limite de 15 personnes par créneau Brunch.</div>
+                        <div class="time-grid" id="timeGrid"></div>
+                        <div class="limit-info" id="brunchLimitInfo" style="display:none;">Limite de 15 personnes par créneau Brunch.</div>
                     </div>
                 </div>
-
                 <div class="btn-group">
                     <button type="button" class="btn-back" onclick="prevStep(2)">Retour</button>
-                    <button type="button" class="btn-next" onclick="nextStep(2)" id="btnStep2">Vérifier mes infos</button>
+                    <button type="button" class="btn-next" onclick="nextStep(2)">Vérifier mes infos</button>
                 </div>
             </div>
 
             <div class="form-step" id="step3">
                 <h2>C'est presque bon !</h2>
-                <p style="text-align: center; color: var(--accent-color); margin-bottom: 30px;">Vérifiez les détails de votre demande pour <strong>LÜM</strong>.</p>
-                
                 <div style="background: var(--bg-color); padding: 25px; border-radius: 16px; color: var(--text-color);">
                     <p style="margin-bottom: 10px;">👤 <strong id="summaryNom"></strong></p>
                     <p style="margin-bottom: 10px;">📧 <span id="summaryEmail"></span></p>
@@ -234,29 +213,30 @@
                     <p id="summaryType" style="margin-top: 5px; font-style: italic; color: var(--accent-color);"></p>
                     <p id="summaryComm" style="margin-top: 10px; font-size: 0.9em; border-top: 1px dashed #ccc; padding-top: 10px; color: #666; display: none;"></p>
                 </div>
-
                 <div class="btn-group">
                     <button type="button" class="btn-back" onclick="prevStep(3)">Modifier</button>
                     <button type="submit" class="btn-next">Confirmer ma demande</button>
                 </div>
             </div>
-
         </form>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
+        // --- SÉCURITÉ : BLOQUER LES DATES PASSÉES ---
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        document.getElementById('date').min = `${yyyy}-${mm}-${dd}`;
+
         const OPEN_HOUR = 10;
         const CLOSE_HOUR = 18;
         const BRUNCH_TIMES = ["11:00", "12:30", "14:00"];
 
-        // --- NAVIGATION ET PROGRESSION ---
         function updateProgress(step) {
             const progressBar = document.getElementById('progressBar');
             const stepNodes = document.querySelectorAll('.step-node');
-            const percent = ((step - 1) / (stepNodes.length - 1)) * 100;
-            progressBar.style.width = percent + '%';
-
+            progressBar.style.width = ((step - 1) / (stepNodes.length - 1)) * 100 + '%';
             stepNodes.forEach((node, index) => {
                 if (index < step - 1) node.className = 'step-node done';
                 else if (index === step - 1) node.className = 'step-node active';
@@ -266,48 +246,20 @@
 
         function nextStep(currentStep) {
             if (currentStep === 1) {
-                const nom = document.getElementById('nom');
-                const email = document.getElementById('email');
-                const phone = document.getElementById('phone');
-                const personnes = document.getElementById('personnes');
-
-                if (!nom.value || !email.value || !phone.value || !personnes.value) {
-                    alert("Merci de remplir tous les champs obligatoires (*).");
-                    return;
+                const fields = ['nom', 'email', 'phone', 'personnes'];
+                for (let f of fields) {
+                    if (!document.getElementById(f).value) { alert("Merci de remplir tous les champs obligatoires."); return; }
                 }
-                
-                if(!email.checkValidity()) {
-                    alert("L'adresse email n'est pas valide.");
-                    return;
-                }
-
-                if(!phone.checkValidity()) {
-                    alert("Le numéro de téléphone n'est pas valide (10 chiffres requis).");
-                    return;
+                if(!document.getElementById('email').checkValidity() || !document.getElementById('phone').checkValidity()) {
+                    alert("Email ou téléphone invalide."); return;
                 }
             }
-
             if (currentStep === 2) {
-                const date = document.getElementById('date');
-                const heure = document.getElementById('heure');
-                const type = document.getElementById('typeReservation');
-
-                if (!date.value) {
-                    alert("Veuillez sélectionner une date.");
-                    return;
+                if (!document.getElementById('date').value || !document.getElementById('heure').value || !document.getElementById('typeReservation').value) {
+                    alert("Veuillez sélectionner date, expérience et horaire."); return;
                 }
-                if (!type.value) {
-                    alert("Veuillez choisir un type d'expérience.");
-                    return;
-                }
-                if (!heure.value) {
-                    alert("Veuillez sélectionner un horaire.");
-                    return;
-                }
-
                 fillSummary();
             }
-
             document.getElementById('step' + currentStep).classList.remove('active');
             document.getElementById('step' + (currentStep + 1)).classList.add('active');
             updateProgress(currentStep + 1);
@@ -320,100 +272,63 @@
         }
 
         function handleDateChange() {
-            const dateInput = document.getElementById('date').value;
+            const dateVal = document.getElementById('date').value;
             const dateTimeSection = document.getElementById('dateTimeSection');
             const tuesdayWarning = document.getElementById('tuesdayWarning');
-            
             dateTimeSection.style.display = 'none';
             tuesdayWarning.style.display = 'none';
-            document.getElementById('heure').value = ''; 
+            document.getElementById('heure').value = '';
             document.getElementById('typeReservation').value = '';
-            document.getElementById('choiceBrunch').classList.remove('selected');
-            document.getElementById('choiceMoment').classList.remove('selected');
+            document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
             document.getElementById('timeGrid').innerHTML = '';
 
-            if (!dateInput) return;
+            if (!dateVal) return;
 
-            const dateObj = new Date(dateInput);
-            const day = dateObj.getDay();
-
-            if (day === 2) { 
-                tuesdayWarning.style.display = 'block';
-            } else {
+            const day = new Date(dateVal).getDay();
+            if (day === 2) { tuesdayWarning.style.display = 'block'; } 
+            else {
                 dateTimeSection.style.display = 'block';
-                
                 if (day === 0 || day === 6) { 
-                    showWeekendOptions(true);
+                    document.getElementById('weekendChoice').style.display = 'block';
                 } else { 
-                    showWeekendOptions(false);
+                    document.getElementById('weekendChoice').style.display = 'none';
                     document.getElementById('typeReservation').value = 'Pause gourmande au LÜM';
                     generateStandardHours();
                 }
             }
         }
 
-        function showWeekendOptions(isWeekend) {
-            const weekendChoice = document.getElementById('weekendChoice');
-            const brunchLimitInfo = document.getElementById('brunchLimitInfo');
-
-            if (isWeekend) {
-                weekendChoice.style.display = 'block';
-                brunchLimitInfo.style.display = 'block';
-            } else {
-                weekendChoice.style.display = 'none';
-                brunchLimitInfo.style.display = 'none';
-            }
-        }
-
         function selectType(type) {
             document.getElementById('typeReservation').value = type;
-            document.getElementById('choiceBrunch').classList.remove('selected');
-            document.getElementById('choiceMoment').classList.remove('selected');
+            document.getElementById('choiceBrunch').classList.toggle('selected', type === 'Brunch');
+            document.getElementById('choiceMoment').classList.toggle('selected', type !== 'Brunch');
+            document.getElementById('brunchLimitInfo').style.display = (type === 'Brunch') ? 'block' : 'none';
             document.getElementById('heure').value = '';
-
-            if (type === 'Brunch') {
-                document.getElementById('choiceBrunch').classList.add('selected');
-                generateBrunchHours();
-            } else {
-                document.getElementById('choiceMoment').classList.add('selected');
-                generateStandardHours();
-            }
+            if (type === 'Brunch') generateBrunchHours(); else generateStandardHours();
         }
 
         function generateBrunchHours() {
-            const timeGrid = document.getElementById('timeGrid');
-            timeGrid.innerHTML = '';
-            BRUNCH_TIMES.forEach(time => {
-                createTimeButton(time, timeGrid);
-            });
+            const grid = document.getElementById('timeGrid'); grid.innerHTML = '';
+            BRUNCH_TIMES.forEach(t => createTimeButton(t, grid));
         }
 
         function generateStandardHours() {
-            const timeGrid = document.getElementById('timeGrid');
-            timeGrid.innerHTML = '';
+            const grid = document.getElementById('timeGrid'); grid.innerHTML = '';
             for (let h = OPEN_HOUR; h < CLOSE_HOUR; h++) {
-                // Heure pile
-                createTimeButton(`${h}:00`, timeGrid);
-                // Demi-heure (autorisée jusqu'à 17h30 inclus)
-                if(h <= 17) {
-                    createTimeButton(`${h}:30`, timeGrid);
-                }
+                createTimeButton(`${h}:00`, grid);
+                if(h <= 17) createTimeButton(`${h}:30`, grid);
             }
         }
 
         function createTimeButton(time, container) {
             const btn = document.createElement('div');
-            btn.className = 'time-slot';
-            btn.innerText = time.replace(':','h');
-            btn.onclick = function() { selectTime(time, btn); };
+            btn.className = 'time-slot'; btn.innerText = time.replace(':','h');
+            btn.onclick = () => {
+                document.getElementById('heure').value = time;
+                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                btn.classList.add('selected');
+            };
             container.appendChild(btn);
-        }
-
-        function selectTime(time, btnEl) {
-            document.getElementById('heure').value = time;
-            const allSlots = document.querySelectorAll('.time-slot');
-            allSlots.forEach(slot => slot.classList.remove('selected'));
-            btnEl.classList.add('selected');
         }
 
         function fillSummary() {
@@ -423,23 +338,16 @@
             document.getElementById('summaryPers').innerText = document.getElementById('personnes').value;
             
             const d = new Date(document.getElementById('date').value);
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('summaryDate').innerText = d.toLocaleDateString('fr-FR', options);
+            const opt = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('summaryDate').innerText = d.toLocaleDateString('fr-FR', opt);
             
             document.getElementById('summaryHeure').innerText = document.getElementById('heure').value.replace(':','h');
             document.getElementById('summaryType').innerText = "(" + document.getElementById('typeReservation').value + ")";
-
-            // Gestion du commentaire dans le résumé
-            const commValue = document.getElementById('commentaires').value;
-            const summaryComm = document.getElementById('summaryComm');
-            if(commValue.trim() !== "") {
-                summaryComm.innerText = "Note : " + commValue;
-                summaryComm.style.display = "block";
-            } else {
-                summaryComm.style.display = "none";
-            }
+            
+            const comm = document.getElementById('commentaires').value;
+            const sComm = document.getElementById('summaryComm');
+            if(comm.trim()) { sComm.innerText = "Note : " + comm; sComm.style.display = "block"; } else { sComm.style.display = "none"; }
         }
-
         updateProgress(1);
     </script>
 </body>
